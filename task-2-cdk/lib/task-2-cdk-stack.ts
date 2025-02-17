@@ -4,6 +4,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 
 export class Task2CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,16 +25,26 @@ export class Task2CdkStack extends cdk.Stack {
       principals: [new iam.CanonicalUserPrincipal(cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
     }));
 
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, "MyDistribution", {
-      originConfigs: [{
-        s3OriginSource: {
-          s3BucketSource: bucket,
-          originAccessIdentity: cloudfrontOAI
+    const distribution = new cloudfront.Distribution(this, "MyDistribution", {
+      defaultBehavior: {
+        origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
+        viewerProtocolPolicy:
+          cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+      },
+      defaultRootObject: "index.html",
+      errorResponses: [
+        {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: "/index.html",
         },
-        behaviors: [{
-          isDefaultBehavior: true
-        }]
-      }]
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: "/index.html",
+        },
+      ]
     });
 
     new s3deploy.BucketDeployment(this, "MyBucketDeployment", {
