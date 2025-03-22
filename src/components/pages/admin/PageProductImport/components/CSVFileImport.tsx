@@ -25,15 +25,25 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
 
   const uploadFile = async () => {
     console.log("uploadFile to", url);
-
+    let response: any;
     //Get the presigned URL
-    const response = await axios({
-      method: "GET",
-      url,
-      params: {
-        name: encodeURIComponent(file!.name),
-      },
-    });
+    try{
+       response = await axios({
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${window.btoa(localStorage.getItem("authorization_token") || " ")}`,
+        },
+        url,
+        params: {
+          name: encodeURIComponent(file!.name),
+        }
+      });
+    }catch(err:any){
+      if(err.response.status == 403 || err.response.status == 401){
+        alert("You are not authorized")
+      }
+    }
+    console.log('response: ', response)
     console.log("File to upload: ", file!.name);
     console.log("Uploading to: ", response.data);
     const result = await fetch(response.data.PreSignedUrl, {
