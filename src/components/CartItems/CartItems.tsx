@@ -13,26 +13,25 @@ type CartItemsProps = {
 
 export default function CartItems({ items, isEditable }: CartItemsProps) {
   const totalPrice: number = items.reduce(
-    (total, item) => item.count * item.product.price + total,
-    0
+    (total, item: any) => item.count * (+item.price) + total, 0
   );
 
   return (
     <>
       <List disablePadding>
-        {items.map((cartItem: CartItem) => (
+        {items.map((cartItem: any) => (
           <ListItem
             sx={{ padding: (theme) => theme.spacing(1, 0) }}
-            key={cartItem.product.id}
+            key={cartItem.product_id}
           >
-            {isEditable && <AddProductToCart product={cartItem.product} />}
+            {isEditable && <AddProductToCart product={cartItem} />}
             <ListItemText
-              primary={cartItem.product.title}
-              secondary={cartItem.product.description}
+              primary={cartItem.title}
+              secondary={cartItem.description}
             />
             <Typography variant="body2">
-              {formatAsPrice(cartItem.product.price)} x {cartItem.count} ={" "}
-              {formatAsPrice(cartItem.product.price * cartItem.count)}
+              {formatAsPrice(cartItem.price)} x {cartItem.count} ={" "}
+              {formatAsPrice(cartItem.price * cartItem.count)}
             </Typography>
           </ListItem>
         ))}

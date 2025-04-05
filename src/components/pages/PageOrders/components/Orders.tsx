@@ -17,7 +17,6 @@ export default function Orders() {
   const { data } = useOrders();
   const invalidateOrders = useInvalidateOrders();
   const { mutate: deleteOrder } = useDeleteOrder();
-
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -31,37 +30,41 @@ export default function Orders() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data?.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell component="th" scope="row">
-                {order.address?.firstName} {order.address?.lastName}
-              </TableCell>
-              <TableCell align="right">{order.items.length}</TableCell>
-              <TableCell align="right">{order.address?.address}</TableCell>
-              <TableCell align="right">
-                {order.statusHistory[order.statusHistory.length - 1].status}
-              </TableCell>
-              <TableCell align="right">
-                <Button
-                  size="small"
-                  color="primary"
-                  component={Link}
-                  to={order.id}
-                >
-                  Manage
-                </Button>
-                <Button
-                  size="small"
-                  color="secondary"
-                  onClick={() =>
-                    deleteOrder(order.id, { onSuccess: invalidateOrders })
-                  }
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {data?.map((order: any) => {
+            let itemsData = JSON.parse(order.items)
+            let address = JSON.parse(order.delivery)
+            return (
+              <TableRow key={order.id}>
+                <TableCell component="th" scope="row">
+                  {address?.firstName} {address?.lastName}
+                </TableCell>
+                <TableCell align="right">{itemsData.length}</TableCell>
+                <TableCell align="right">{address?.address}</TableCell>
+                <TableCell align="right">
+                  {order.status}
+                </TableCell>
+                <TableCell align="right">
+                  <Button
+                    size="small"
+                    color="primary"
+                    component={Link}
+                    to={order.id}
+                  >
+                    Manage
+                  </Button>
+                  <Button
+                    size="small"
+                    color="secondary"
+                    onClick={() =>
+                      deleteOrder(order.id, { onSuccess: invalidateOrders })
+                    }
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </TableContainer>

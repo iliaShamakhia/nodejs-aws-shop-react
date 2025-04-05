@@ -55,7 +55,7 @@ export default function PageOrder() {
   ] = results;
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const invalidateOrder = useInvalidateOrder();
-  const cartItems: CartItem[] = React.useMemo(() => {
+  const cartItems: CartItem[] = React.useMemo(() => { 
     if (order && products) {
       return order.items.map((item: OrderItem) => {
         const product = products.find((p) => p.id === item.productId);
@@ -70,24 +70,28 @@ export default function PageOrder() {
 
   if (isOrderLoading || isProductsLoading) return <p>loading...</p>;
 
-  const statusHistory = order?.statusHistory || [];
-
-  const lastStatusItem = statusHistory[statusHistory.length - 1];
+  
+  let orderAny = order as any;
+  let itemsParsed = JSON.parse(orderAny?.items)
+  const status = orderAny?.status || '';
+  const addressParsed = JSON.parse(orderAny?.payment);
+  const statusHistory = [status];
+  //const lastStatusItem = statusHistory[statusHistory.length - 1];
 
   return order ? (
     <PaperLayout>
       <Typography component="h1" variant="h4" align="center">
         Manage order
       </Typography>
-      <ReviewOrder address={order.address} items={cartItems} />
+      <ReviewOrder address={addressParsed} items={itemsParsed} />
       <Typography variant="h6">Status:</Typography>
       <Typography variant="h6" color="primary">
-        {lastStatusItem?.status.toUpperCase()}
+        {status.toUpperCase()}
       </Typography>
       <Typography variant="h6">Change status:</Typography>
       <Box py={2}>
         <Formik
-          initialValues={{ status: lastStatusItem.status, comment: "" }}
+          initialValues={{ status: status, comment: "" }}
           enableReinitialize
           onSubmit={(values) =>
             updateOrderStatus(
@@ -158,12 +162,12 @@ export default function PageOrder() {
             {statusHistory.map((statusHistoryItem) => (
               <TableRow key={order.id}>
                 <TableCell component="th" scope="row">
-                  {statusHistoryItem.status.toUpperCase()}
+                  {statusHistoryItem.toUpperCase()}
                 </TableCell>
                 <TableCell align="right">
-                  {new Date(statusHistoryItem.timestamp).toString()}
+                  {new Date().toString()}
                 </TableCell>
-                <TableCell align="right">{statusHistoryItem.comment}</TableCell>
+                <TableCell align="right">{addressParsed.comment}</TableCell>
               </TableRow>
             ))}
           </TableBody>

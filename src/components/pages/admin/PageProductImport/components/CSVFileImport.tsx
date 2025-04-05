@@ -24,7 +24,6 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
   };
 
   const uploadFile = async () => {
-    console.log("uploadFile to", url);
     let authToken = localStorage.getItem("authorization_token");
     let response: any;
     //Get the presigned URL
@@ -46,14 +45,10 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
         alert(`Error: ${statusCode}, Authorization token is missing`)
       }
     }
-    console.log('response: ', response)
-    console.log("File to upload: ", file!.name);
-    console.log("Uploading to: ", response.data);
     const result = await fetch(response.data.PreSignedUrl, {
       method: "PUT",
       body: file,
     });
-    console.log("Result: ", result);
     setFile(undefined);
   };
   return (
