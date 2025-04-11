@@ -59,8 +59,8 @@ export default function PageCart() {
       return;
     }
     const values = {
-      items: data.map((i) => ({
-        productId: i.product.id,
+      items: data.map((i: any) => ({
+        productId: i.product?.id ? i.product.id : i.product_id,
         count: i.count,
       })),
       address,
@@ -82,7 +82,6 @@ export default function PageCart() {
     setAddress(values);
     handleNext();
   };
-
   return (
     <PaperLayout>
       <Typography component="h1" variant="h4" align="center">

@@ -24,23 +24,31 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
   };
 
   const uploadFile = async () => {
-    console.log("uploadFile to", url);
-
+    let authToken = localStorage.getItem("authorization_token");
+    let response: any;
     //Get the presigned URL
-    const response = await axios({
-      method: "GET",
-      url,
-      params: {
-        name: encodeURIComponent(file!.name),
-      },
-    });
-    console.log("File to upload: ", file!.name);
-    console.log("Uploading to: ", response.data);
+    try{
+       response = await axios({
+        method: "GET",
+        headers: authToken ? { Authorization: `Basic ${window.btoa(authToken)}` } : {},
+        url,
+        params: {
+          name: encodeURIComponent(file!.name),
+        }
+      });
+    }catch(err:any){
+      let statusCode = err.response.status;
+      if(statusCode == 403){
+        alert(`Error: ${statusCode}, You are not authorized`)
+      }
+      if(statusCode == 401){
+        alert(`Error: ${statusCode}, Authorization token is missing`)
+      }
+    }
     const result = await fetch(response.data.PreSignedUrl, {
       method: "PUT",
       body: file,
     });
-    console.log("Result: ", result);
     setFile(undefined);
   };
   return (
